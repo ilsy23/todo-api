@@ -7,6 +7,7 @@ import com.example.todo.todoapi.dto.response.TodoListResponseDTO;
 import com.example.todo.todoapi.service.TodoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.validation.BindingResult;
@@ -41,7 +42,12 @@ public class TodoController {
         try {
             return ResponseEntity
                     .ok()
-                    .body(todoService.create(requestDTO, userInfo.getUserId()));
+                    .body(todoService.create(requestDTO, userInfo));
+        } catch (IllegalStateException e) {
+            // 권한 때문에 발생한 예외
+            log.warn(e.getMessage());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(e.getMessage());
         } catch (RuntimeException e) {
             e.printStackTrace();
             return ResponseEntity
@@ -51,6 +57,7 @@ public class TodoController {
                             .error(e.getMessage())
                             .build());
         }
+
     }
 
     // 할 일 목록 요청

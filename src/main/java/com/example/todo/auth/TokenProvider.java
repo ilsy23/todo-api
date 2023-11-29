@@ -1,6 +1,8 @@
 package com.example.todo.auth;
 
+import com.example.todo.userapi.entity.Role;
 import com.example.todo.userapi.entity.User;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -33,7 +35,7 @@ public class TokenProvider {
 
     /**
      * JSON Web Token을 생서하는 메서드
-     * @param userEntity - 토큰의 내용(클레임)에 포함될 유저 정보
+     * @param userEntity 토큰의 내용(클레임)에 포함될 유저 정보
      * @return - 생성된 JSON을 암호화 한 토큰 값
      */
     public String createToken(User userEntity){
@@ -70,4 +72,29 @@ public class TokenProvider {
                 .setSubject(userEntity.getId()) // sub: 토큰을 식별할 수 있는 주요 데이터
                 .compact();
     }
+
+    /**
+     * 클라이언트가 전송한 토큰을 디코딩하여 토큰의 위조 여부 확인
+     * 토큰을 json으로 파싱해서 클레임(토큰 정보) 리턴
+     * @param token
+     * @return - 토큰 안에 있는 인증된 유저 정보 반환
+     */
+    public TokenUserInfo validateAndGetTokenUserInfo(String token){
+        Claims claims = Jwts.parserBuilder()
+                // 토큰 발급자의 발급 당시 서명
+                .setSigningKey(Keys.hmacShaKeyFor(SECRET_KEY.getBytes()))
+                // 서명 위조 검사: 위조된 경우에는 예외가 발생합니다.
+                // 위조가 되지 않은 경우 payload를 리턴
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+
+        log.info("claims: {}", claims);
+        return TokenUserInfo.builder()
+                .userId(claims.getSubject())
+                .email(claims.get("email", String.class))
+                .role(Role.valueOf(claims.get("role", String.class)))
+                .build();
+    }
+
 }

@@ -9,6 +9,7 @@ import com.example.todo.userapi.dto.response.UserSignUpResponseDTO;
 import com.example.todo.userapi.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.tomcat.util.buf.UEncoder;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -189,4 +190,10 @@ public class UserController {
 
     }
 
+    @GetMapping("/kakaoLogin")
+    public ResponseEntity<?> kakaoLogin(String code) {
+        log.info("/api/auth/kakaoLogin - GET -code: {}", code);
+        userService.kakaoService(code);
+        return null;
+    }
 }

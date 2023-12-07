@@ -23,7 +23,7 @@ public class TokenProvider {
 
     // 토큰 만료시간 생성
     Date expiry = Date.from(
-            Instant.now().plus(10, ChronoUnit.SECONDS)
+            Instant.now().plus(1, ChronoUnit.MINUTES)
     );
 
     // 서명에 사용할 값 (512비트 이상의 랜덤 문자열)

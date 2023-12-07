@@ -147,8 +147,8 @@ public class UserController {
             // 만약 존재하지 않는 경로라면 클라이언트로 404 status를 리턴.
             if(!profileFile.exists()) {
                 if(filePath.startsWith("http")){
-//                    return ResponseEntity.status(208).body(filePath);
-                    return ResponseEntity.ok().body(filePath);
+                    return ResponseEntity.status(208).body(filePath);
+//                    return ResponseEntity.ok().body(filePath);
                 }
                 return ResponseEntity.notFound().build();
             }

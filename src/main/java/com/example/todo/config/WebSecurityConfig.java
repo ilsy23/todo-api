@@ -1,6 +1,7 @@
 package com.example.todo.config;
 
 import com.example.todo.filter.JwtAuthFilter;
+import com.example.todo.filter.JwtExceptionFilter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,6 +23,7 @@ import org.springframework.web.filter.CorsFilter;
 public class WebSecurityConfig {
 
     private final JwtAuthFilter jwtAuthFilter;
+    private final JwtExceptionFilter jwtExceptionFilter;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -61,6 +63,14 @@ public class WebSecurityConfig {
                jwtAuthFilter,
                CorsFilter.class // import 주의: 스프링 고르기
        );
+
+       // Exception Filter를 Auth Filter 앞에 배치하겠다는 뜻.
+        // Filter 역할을 하는 클래스는 Spring Container 내부에 배치되는 것이 아니기 때문에
+        // Spring이 제공하는 예외 처리 등이 힘들 수 있다.
+        // 예외 처리만을 전담하는 필터를 생성해서, 예외가 발생하는 필터 앞단에 배치하면
+        // 예외가 먼저 배치된 필터로 넘어가서 처리가 가능하게 됩니다.
+
+       http.addFilterBefore(jwtExceptionFilter, JwtAuthFilter.class);
 
         return http.build();
     }
